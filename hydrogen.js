@@ -157,6 +157,17 @@ HYDROGEN.Vector3.prototype {
         return this
     },
 
+    setX: function() {
+        return this.x;
+    },
+    setY: function() {
+        return this.y;
+    },
+    setZ: function() {
+        return this.z;
+    },
+
+
     copy: function(a) {
         this.x = a.x;
         this.y = a.y;
@@ -325,6 +336,19 @@ HYDROGEN.Vector4.prototype {
         return this
     },
 
+    setX: function() {
+        return this.x;
+    },
+    setY: function() {
+        return this.y;
+    },
+    setZ: function() {
+        return this.z;
+    },
+    setW: function() {
+        return this.w;
+    },
+
     copy: function(a) {
         this.x = a.x;
         this.y = a.y;
@@ -345,6 +369,14 @@ HYDROGEN.Vector4.prototype {
         return this
     },
 
+    addF: function(a) {
+        return new Vector4(
+            this.x += a.x,
+            this.y += a.y,
+            this.z += a.y,
+            this.w += a.w)
+    },
+
     addScalar: function(a) {
         this.x += a;
         this.y += a;
@@ -359,6 +391,14 @@ HYDROGEN.Vector4.prototype {
         this.z -= a.z;
         this.w -= a.w;
         return this
+    },
+
+    subtractF: function(a) {
+        return new Vector4(
+            this.x -= a.x,
+            this.y -= a.y,
+            this.z -= a.z,
+            this.w -= a.w)
     },
 
     multiplyScalar: function(a) {
@@ -723,6 +763,23 @@ HYDROGEN.AABB3D.prototype = {
         this.hz = hz;
     },
 
+    getV: function() {
+        return this.v;
+    },
+
+    getHX: function() {
+        return this.hx;
+    },
+
+    getHY: function() {
+        return this.hy;
+    },
+
+    getHZ: function() {
+        return this.hz;
+    },
+
+
     setFromVerticesList: function(vlist) {
 
         xmax, ymax, zmax = void 0;
@@ -882,7 +939,7 @@ HYDROGEN.AABB2D.prototype = {
 
     }
 };
- 
+
 //Define Object-Aligned Bounding Box in 2D
 HYDROGEN.OABB2D = function(p, q, hx, hy) {
     this.p = p;
