@@ -53,7 +53,11 @@ HYDROGEN.Vector2.prototype {
         return this
     },
 
-    multiplyScalar: function(a) {
+    subtractF: function(a) {
+        return new Vector2(this.x - a.x, this.y - a.y);
+    }
+
+        multiplyScalar: function(a) {
         this.x *= a;
         this.y *= a;
         return this
@@ -762,6 +766,34 @@ HYDROGEN.BoundingPlane3D.prototype = {
     }
 };
 
+HYDROGEN.BoundingSphere2D = function(v, r) {
+    this.v = v;
+    this.r = r;
+};
+HYDROGEN.BoundingSphere2D.prototype = {
+
+    constructor: HYDROGEN.BoundingSphere2D,
+
+    setV: function(v) {
+        this.v = v;
+    },
+
+    setR: function(r) {
+        this.r = r;
+    },
+
+    setFromVerticesList: function(vlist) {
+
+        //Calculate smallest bounding sphere
+        //Several algorithms
+
+        for (var i = 0; i < vlist.length; i++) {
+            //DO SOMETHING
+        };
+    }
+};
+
+
 HYDROGEN.AABB2D = function(v, hx, hy) {
     this.v = v;
     this.hx = hx;
@@ -874,6 +906,24 @@ HYDROGEN.CollisionDetector2D.prototype = {
     constructor: HYDROGEN.CollisionDetector2D
 
         checkForCollision: function(a, b) {
+        // body...
+
+    },
+
+    BoundingSphere_2DBoundingSphere2D: function(a, b) {
+        //Return truthy if intersecting
+        return (a.r + b.r) * (a.r + b.r) < a.v.subtractF(b.v).lengthSquared();
+    },
+
+    AABB2D_AABB2: function(a, b) {
+        var a_xmax, a_xmin;
+        var b_xmax, b_xmin;
+        var a_ymax, a_ymin;
+        var b_ymax, b_ymin;
+
+    },
+
+    OABB3D_OABB3D: function(a, b) {
         // body...
     }
 };
