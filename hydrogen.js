@@ -25,7 +25,15 @@ HYDROGEN.Vector2.prototype {
         return this
     },
 
-    copy: function(a) {
+    getX: function() {
+        return this.x;
+    },
+
+    getY: function() {
+        return this.y;
+    }
+
+        copy: function(a) {
         this.x = a.x;
         this.y = a.y;
         return this
@@ -820,6 +828,18 @@ HYDROGEN.AABB2D.prototype = {
         this.hy = hy;
     },
 
+    getV: function() {
+        return this.v;
+    },
+
+    getHX: function() {
+        return this.hx;
+    },
+
+    getHY: function() {
+        return this.hy;
+    },
+
     setFromVerticesList: function(vlist) {
 
         xmax, ymax = void 0;
@@ -920,6 +940,28 @@ HYDROGEN.CollisionDetector2D.prototype = {
         var b_xmax, b_xmin;
         var a_ymax, a_ymin;
         var b_ymax, b_ymin;
+        var av, bv;
+
+        av = a.getV();
+        bv = b.getV();
+
+        a_xmin = a_xmax = av.getX();
+        a_xmax += a.getHX();
+        a_xmin -= a.getHX();
+
+        b_xmin = b_xmax = bv.getX();
+        b_xmax += b.getHX();
+        b_xmin -= b.getHX();
+
+        a_ymin = a_ymax = av.getY();
+        a_ymax += a.getHY();
+        a_ymin -= a.getHY();
+
+        b_ymin = b_ymax = bv.getY();
+        b_ymax += b.getHY();
+        b_ymin -= b.getHY();
+
+        return a_xmax > b_xmin && a_xmin > b_xmax || a_ymax > b_ymin && a_ymin > b_ymax ? !1 : !0;
 
     },
 
