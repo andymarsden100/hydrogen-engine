@@ -961,7 +961,7 @@ HYDROGEN.CollisionDetector2D.prototype = {
         b_ymax += b.getHY();
         b_ymin -= b.getHY();
 
-        return a_xmax > b_xmin && a_xmin > b_xmax || a_ymax > b_ymin && a_ymin > b_ymax ? !1 : !0;
+        return a_xmax > b_xmin && a_xmin > b_xmax || a_ymax > b_ymin && a_ymin > b_ymax;
 
     },
 
