@@ -1,3 +1,13 @@
+/*
+HYDROGEN.JS
+
+Comments:
+
+    Functions flagged with an F e.g. addF(), are purely functional, in that they do
+    not alter the object on which they are called and have no side effects
+
+*/
+
 //Create Hydrogen object
 var HYDROGEN = HYDROGEN || {}
 
@@ -466,7 +476,6 @@ HYDROGEN.Matrix22.prototype {
 //[0,1,2]
 //[3,4,5]
 //[6,7,8]
-
 HYDROGEN.Matrix33 = function(a, b, c, d, e, f, g, h, i) {
     this.m = [];
     this.m[0] = a !== void 0 ? a : 1;
@@ -563,7 +572,6 @@ HYDROGEN.Matrix33.prototype = {
 //[ 4, 5, 6, 7]
 //[ 8, 9,10,11]
 //[12,13,14,15]
-
 HYDROGEN.Matrix44 = function(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) {
     this.m = [];
     this.m[0] = a !== void 0 ? a : 0;
@@ -642,6 +650,7 @@ HYDROGEN.Matrix44.prototype = {
     }
 };
 
+//Define Quarternion
 HYDROGEN.Quarternion = function(a, b, c, d) {
     this.a = a || 0;
     this.b = b || 0;
@@ -653,6 +662,7 @@ HYDROGEN.Quarternion.prototype = {
         //TO COMPLETE
 };
 
+//Define BoundingSphere3D
 HYDROGEN.BoundingSphere3D = function(v, r) {
     this.v = v;
     this.r = r;
@@ -680,6 +690,7 @@ HYDROGEN.BoundingSphere3D.prototype = {
     }
 };
 
+//Define Axis-Aligned Bounding-Box in 3D
 HYDROGEN.AABB3D = function(v, hx, hy, hz) {
     this.v = v;
     this.hx = hx;
@@ -745,6 +756,7 @@ HYDROGEN.AABB3D.prototype = {
     }
 };
 
+//Define Object-Aligned Bounding-Box in 3D
 HYDROGEN.OABB3D = function(p, q, hx, hy, hz) {
     this.p = p;
     this.q = q;
@@ -756,6 +768,7 @@ HYDROGEN.OABB3D.prototype = {
     constructor: HYDROGEN.OABB3D
 };
 
+//Define Bounding Cylinder in 3D
 HYDROGEN.BoundingCylinder3D = function() {
     // body...
 };
@@ -763,6 +776,7 @@ HYDROGEN.BoundingCylinder3D.prototype = {
     constructor: HYDROGEN.BoundingCylinder3D
 };
 
+//Define Bounding Plane in 3D
 HYDROGEN.BoundingPlane3D = function(p, n) {
     if p !== void 0 ? this.p = p : this.p = new Vector3();
     if n !== void 0 ? this.n = n : this.n = new Vector3(0, 0, 1)
@@ -774,6 +788,7 @@ HYDROGEN.BoundingPlane3D.prototype = {
     }
 };
 
+//Define Bounding Sphere in 2D
 HYDROGEN.BoundingSphere2D = function(v, r) {
     this.v = v;
     this.r = r;
@@ -801,7 +816,7 @@ HYDROGEN.BoundingSphere2D.prototype = {
     }
 };
 
-
+//Define Axis-Aligned Bounding-Box in 2D
 HYDROGEN.AABB2D = function(v, hx, hy) {
     this.v = v;
     this.hx = hx;
@@ -867,7 +882,8 @@ HYDROGEN.AABB2D.prototype = {
 
     }
 };
-
+ 
+//Define Object-Aligned Bounding Box in 2D
 HYDROGEN.OABB2D = function(p, q, hx, hy) {
     this.p = p;
     this.q = q;
@@ -878,6 +894,7 @@ HYDROGEN.OABB2D.prototype = {
     constructor: HYDROGEN.OABB2D
 };
 
+//Define Bounding Plane in 2D
 HYDROGEN.BoundingPlane2D = function(p, n) {
     if p !== void 0 ? this.p = p : this.p = new Vector2();
     if n !== void 0 ? this.n = n : this.n = new Vector2(0, 1)
@@ -889,6 +906,7 @@ HYDROGEN.BoundingPlane2D.prototype = {
     }
 };
 
+//Define Ray object in 2D
 HYDROGEN.Ray2D = function(p, v) {
     this.p = p;
     this.v = v;
@@ -904,6 +922,7 @@ HYDROGEN.Ray2D.prototype = {
     }
 };
 
+//Define Ray object in 3D
 HYDROGEN.Ray3D = function(p, v) {
     this.p = p;
     this.v = v;
@@ -919,6 +938,7 @@ HYDROGEN.Ray3D.prototype = {
     }
 };
 
+//Define Collision Detector for 2D
 HYDROGEN.CollisionDetector2D = function() {
     // body...
 };
