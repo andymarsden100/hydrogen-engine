@@ -105,7 +105,12 @@ HYDROGEN.Vector2.prototype {
     },
 
     normalise: function() {
-        return this.divideScalar(this.length)
+        return this.divideScalar(this.length())
+    },
+
+    normaliseF: function() {
+        var l = this.length();
+        return new Vector2(this.x / l, this.y / l)
     },
 
     setLength: function(l) {
@@ -262,6 +267,14 @@ HYDROGEN.Vector3.prototype {
 
     normalise: function() {
         return this.divideScalar(this.length)
+    },
+
+    normaliseF: function() {
+        var l = this.length();
+        return new Vector3(this.x / l,
+            this.y / l,
+            this.z / l)
+
     },
 
     setLength: function(l) {
@@ -436,6 +449,14 @@ HYDROGEN.Vector4.prototype {
 
     normalise: function() {
         return this.divideScalar(this.length)
+    },
+
+    normaliseF: function() {
+        var l = this.length();
+        return new Vector4(this.x / l,
+            this.y / l,
+            this.z / l,
+            this.w / l)
     },
 
     setLength: function(l) {
