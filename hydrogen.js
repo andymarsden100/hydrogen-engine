@@ -1025,10 +1025,17 @@ HYDROGEN.CollisionDetector2D.prototype = {
 
         checkForCollision: function(a, b) {
         // body...
+        if a instanceof BoundingSphere2D && b instanceof BoundingSphere2D{
+        	return BoundingSphere2D_BoundingSphere2D(a,b);
+        }else if a instanceof AABB2D && b instanceof  AABB2D{
+        	return AABB2D_AABB2(a,b)
+        }else{
+        	return false;
+        }
 
     },
 
-    BoundingSphere_2DBoundingSphere2D: function(a, b) {
+    BoundingSphere2D_BoundingSphere2D: function(a, b) {
         //Return truthy if intersecting
         return (a.r + b.r) * (a.r + b.r) < a.v.subtractF(b.v).lengthSquared();
     },
