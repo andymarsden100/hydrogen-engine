@@ -1025,12 +1025,14 @@ HYDROGEN.CollisionDetector2D.prototype = {
 
         checkForCollision: function(a, b) {
         // body...
-        if a instanceof BoundingSphere2D && b instanceof BoundingSphere2D{
-        	return BoundingSphere2D_BoundingSphere2D(a,b);
-        }else if a instanceof AABB2D && b instanceof  AABB2D{
-        	return AABB2D_AABB2(a,b)
-        }else{
-        	return false;
+        if a instanceof BoundingSphere2D && b instanceof BoundingSphere2D {
+            return BoundingSphere2D_BoundingSphere2D(a, b);
+        } else if a instanceof AABB2D && b instanceof AABB2D {
+            return AABB2D_AABB2(a, b);
+        } else if a instanceof OABB2D && b instanceof OABB2D {
+            return OABB2D_OABB2D(a, b);
+        } else {
+            //finish
         }
 
     },
@@ -1070,7 +1072,37 @@ HYDROGEN.CollisionDetector2D.prototype = {
 
     },
 
-    OABB3D_OABB3D: function(a, b) {
+    OABB2D_OABB2D: function(a, b) {
         // body...
     }
+};
+
+//Define Collision Detector for 3D
+HYDROGEN.CollisionDetector3D = function() {
+    // body...
+};
+HYDROGEN.CollisionDetector3D.prototype = {
+    function checkForCollision(a, b) {
+            if a instanceof BoundingSphere3D && b instanceof BoundingSphere3D {
+                return BoundingSphere3D_BoundingSphere3D(a, b);
+            } else if a instanceof AABB3D && b instanceof AABB3D {
+                return AABB3D_AABB3D(a, b);
+            } else if c {
+                return OABB3D_OABB3D(a, b);
+            } else {
+                return false;
+            }
+        },
+
+        function BoundingSphere3D_BoundingSphere3D(a, b) {
+            return false;
+        },
+
+        function AABB3D_AABB3D(a, b) {
+            return false;
+        },
+
+        function OABB3D_OABB3D(a, b) {
+            return false;
+        }
 };
