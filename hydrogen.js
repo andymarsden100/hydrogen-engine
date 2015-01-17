@@ -713,14 +713,74 @@ HYDROGEN.Matrix44.prototype = {
 
 //Define Quarternion
 HYDROGEN.Quarternion = function(a, b, c, d) {
-    this.a = a || 0;
-    this.b = b || 0;
-    this.c = c || 0;
-    this.d = d || 0;
+    this.r = a || 0;
+    this.x = b || 0;
+    this.y = c || 0;
+    this.z = d || 0;
 };
 HYDROGEN.Quarternion.prototype = {
-    constructor: HYDROGEN.Quarternion
-        //TO COMPLETE
+    constructor: HYDROGEN.Quarternion,
+
+    QuarternionFromList: function(list) {
+        this.r = list[0];
+        this.x = list[1];
+        this.y = list[2];
+        this.z = list[3];
+    },
+
+    QuarternionFromAngleVector: function(a, v) {
+        var sinhalf = Math.sin(a / 2.0);
+        var coshalf = Math.sin(a / 2.0);
+        this.r = coshalf;
+        this.x = v.x * sinhalf;
+        this.y = v.y * sinhalf;
+        this.z = v.z * sinhalf;
+        this.normalise();
+    },
+
+    normalise: function() {
+        var l = Math.sqrt(this.r * this.r + this.x * this.x + this.y * this.y + this.z * this.z);
+        this.r *= 1 / l;
+        this.x *= 1 / l;
+        this.y *= 1 / l;
+        this.z *= 1 / l;
+    },
+
+    normaliseF: function() {
+        var l = Math.sqrt(this.r * this.r + this.x * this.x + this.y * this.y + this.z * this.z);
+        return new Quarternion(this.r / l, this.x / l, this.y / l, this.z / l);
+    },
+
+    addF: function(q) {
+        return new Quarternion(this.r + q.r, this.x + q.x, this.y + q.y, this.z + q.z);
+    },
+
+    add: function(q) {
+        this.r += q.r;
+        this.x += q.x;
+        this.y += q.y;
+        this.z += q.z;
+    },
+
+    subtract: function(q) {
+        return new Quarternion(this.r - q.r, this.x - q.x, this.y - q.y, this.z - q.z);
+    },
+
+    subtractF: function(q) {
+        this.r -= q.r;
+        this.x -= q.x;
+        this.y -= q.y;
+        this.z -= q.z;
+    },
+
+    multiplyScalar: function(a) {
+        // body...
+    },
+
+    multiplyScalarF: function(a) {
+        // body...
+    }
+
 };
 
 //Define BoundingSphere3D
