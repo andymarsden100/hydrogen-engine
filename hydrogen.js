@@ -708,6 +708,10 @@ HYDROGEN.Matrix44.prototype = {
 
     multiplyMatrix44: function(m) {
         // body...
+    },
+
+    multiplyMatrix44F: function(m) {
+        // body...
     }
 };
 
@@ -721,14 +725,14 @@ HYDROGEN.Quarternion = function(a, b, c, d) {
 HYDROGEN.Quarternion.prototype = {
     constructor: HYDROGEN.Quarternion,
 
-    QuarternionFromList: function(list) {
+    SetFromList: function(list) {
         this.r = list[0];
         this.x = list[1];
         this.y = list[2];
         this.z = list[3];
     },
 
-    QuarternionFromAngleVector: function(a, v) {
+    SetFromAngleVector: function(a, v) {
         var sinhalf = Math.sin(a / 2.0);
         var coshalf = Math.sin(a / 2.0);
         this.r = coshalf;
@@ -747,7 +751,7 @@ HYDROGEN.Quarternion.prototype = {
     },
 
     normaliseF: function() {
-        var l = Math.sqrt(this.r * this.r + this.x * this.x + this.y * this.y + this.z * this.z);
+        var l = this.getMagnitude();
         return new Quarternion(this.r / l, this.x / l, this.y / l, this.z / l);
     },
 
@@ -790,6 +794,46 @@ HYDROGEN.Quarternion.prototype = {
 
     divideScalarF: function(a) {
         return this.multiplyScalarF(1 / a);
+    },
+
+    getMagnitudeSquared: function() {
+        return this.r * this.r + this.x * this.x + this.y * this.y + this.z * this.z;
+    },
+
+    getMagnitude: function() {
+        return Math.sqrt(this.getMagnitudeSquared());
+    },
+
+    multiply: function(q) {
+
+        //Check commutativity of quarternion mulitpliciation
+        this.r = this.r * q.r - this.x * q.x - this.y * q.y - this.z * q.z;
+        this.x = this.r * q.x + this.x * q.r + this.y * q.z - this.z * q.y;
+        this.y = this.r * q.y - this.x * q.z + this.y * q.r + this.z * q.x;
+        this.z = this.r * q.z + this.x * q.y - this.y * q.x + this.z * q.r;
+    },
+
+    multiplyF: function(q) {
+        return new Quarternion(this.r * q.r - this.x * q.x - this.y * q.y - this.z * q.z,
+            this.r * q.x + this.x * q.r + this.y * q.z - this.z * q.y,
+            this.r * q.y - this.x * q.z + this.y * q.r + this.z * q.x,
+            this.r * q.z + this.x * q.y - this.y * q.x + this.z * q.r);
+    },
+
+    toMatrix33: function() {
+        var a = this.r;
+        var b = this.x;
+        var c = this.y;
+        var d = this.z;
+        var M = new Matrix33(1.0 - 2.0 * (c * c + d * d),
+            2.0 * (b * c - a * d),
+            2.0 * (a * c + b * d),
+            2.0 * (b * c + a * d),
+            1.0 - 2.0 * (b * b + d * d),
+            2.0 * (c * d - a * b),
+            2.0 * (b * d - a * c),
+            2.0 * (a * b + c * d),
+            1.0 - 2.0 * (b * b + c * c));
     }
 
 };
