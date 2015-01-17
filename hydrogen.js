@@ -774,11 +774,22 @@ HYDROGEN.Quarternion.prototype = {
     },
 
     multiplyScalar: function(a) {
-        // body...
+        this.r *= a;
+        this.x *= a;
+        this.y *= a;
+        this.z *= a;
     },
 
     multiplyScalarF: function(a) {
-        // body...
+        return new Quarternion(this.r * a, this.x * a, this.y * a, this.z * a);
+    },
+
+    divideScalar: function(a) {
+        this.multiplyScalar(1 / a);
+    },
+
+    divideScalarF: function(a) {
+        return this.multiplyScalarF(1 / a);
     }
 
 };
