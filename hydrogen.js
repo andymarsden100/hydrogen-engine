@@ -722,6 +722,17 @@ HYDROGEN.Quarternion = function(a, b, c, d) {
     this.y = c || 0;
     this.z = d || 0;
 };
+HYDROGEN.Quarternion.SetFromAngleVectorF = function(a, v) {
+    var sinhalf = Math.sin(a / 2.0);
+    var coshalf = Math.sin(a / 2.0);
+    var q = new Quarternion();
+    q.r = coshalf;
+    q.x = v.x * sinhalf;
+    q.y = v.y * sinhalf;
+    q.z = v.z * sinhalf;
+    q.normalise();
+    return q;
+};
 HYDROGEN.Quarternion.prototype = {
     constructor: HYDROGEN.Quarternion,
 
