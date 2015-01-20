@@ -49,7 +49,7 @@ HYDROGEN.prototype {
         .5, -.5, 0.0, -.5, -.5, 0.0
     ];
 
-    quickStart: function(canvas_name) {
+        quickStart: function(canvas_name) {
             initWebGL(canvas_name);
             initViewPort()
         },
@@ -164,19 +164,27 @@ HYDROGEN.Vector2.prototype {
     add: function(a) {
         this.x += a.x;
         this.y += a.y;
-        return this
+        return this;
+    },
+
+    addF: function(a) {
+        return new Vector2(this.x + a.x, this.y + a.y)
     },
 
     addScalar: function(a) {
         this.x += a;
         this.y += a;
-        return this
+        return this;
+    },
+
+    addScalarF: function(a) {
+        return new Vector2(this.x + a, this.y + a);
     },
 
     subtract: function(a) {
         this.x -= a.x;
         this.y -= a.y;
-        return this
+        return this;
     },
 
     subtractF: function(a) {
@@ -189,10 +197,18 @@ HYDROGEN.Vector2.prototype {
         return this
     },
 
+    multiplyScalarF: function(a) {
+        return new Vector2(this.x * a, this.y * a)
+    },
+
     addScaledVector: function(v, a) {
         this.x += a * v.x;
         this.y += a * v.y;
         return this
+    },
+
+    addScaledVectorF: function(v, a) {
+        return new Vector2(this.x + a * v.x, this.y + a * v.y)
     },
 
     divideScalar: function(a) {
@@ -349,7 +365,8 @@ HYDROGEN.Vector3.prototype {
     addScaledVector: function(v, a) {
         this.x += a * v.x;
         this.y += a * v.y;
-        this.z += a * v.z
+        this.z += a * v.z,
+            return this
     },
 
     addScaledVectorF: function(v, a) {
@@ -362,6 +379,7 @@ HYDROGEN.Vector3.prototype {
 
     divideScalar: function(a) {
         a ? (this.x /= a, this.y /= a, this.z /= a) : this.z = this.y = this.x = 0: ;
+        return this
     },
 
     divideScalarF: function(a) {
@@ -427,7 +445,8 @@ HYDROGEN.Vector3.prototype {
 
         this.x = m[0] * $x + m[1] * $y + m[2] * $z;
         this.y = m[3] * $x + m[4] * $y + m[5] * $z;
-        this.z = m[6] * $x + m[7] * $y + m[8] * $z
+        this.z = m[6] * $x + m[7] * $y + m[8] * $z;
+        return this
     },
 
     multiplyMatrix33F: function(m) {
@@ -559,6 +578,10 @@ HYDROGEN.Vector4.prototype {
         return this
     },
 
+    multiplyScalarF: function(a) {
+        // body...
+    },
+
     addScaledVector: function(v, a) {
         this.x += a * v.x;
         this.y += a * v.y;
@@ -567,9 +590,17 @@ HYDROGEN.Vector4.prototype {
         return this
     },
 
+    addScaledVectorF: function(v, a) {
+        // body...
+    },
+
     divideScalar: function(a) {
         a ? (this.x /= a, this.y /= a, this.z /= a, this.w /= a) : this.w = this.z = this.y = this.x = 0;
         return this
+    },
+
+    divideScalarF: function(a) {
+        // body...
     },
 
     dot: function(v) {
@@ -613,7 +644,8 @@ HYDROGEN.Vector4.prototype {
         this.x = m[0] * $x + m[1] * $y + m[2] * $z + m[3] * $w;
         this.y = m[4] * $x + m[5] * $y + m[6] * $z + m[7] * $w;
         this.z = m[8] * $x + m[9] * $y + m[10] * $z + m[11] * $w;
-        this.w = m[12] * $x + m[13] * $y + m[14] * $z + m[15] * $w
+        this.w = m[12] * $x + m[13] * $y + m[14] * $z + m[15] * $w;
+        return this;
     },
 
     multiplyMatrix44F: function(m) {
@@ -626,7 +658,7 @@ HYDROGEN.Vector4.prototype {
         var $y = this.y;
         var $z = this.z;
         var $w = this.w;
-        
+
         return new Vector4(
             this.x = m[0] * $x + m[1] * $y + m[2] * $z + m[3] * $w,
             this.y = m[4] * $x + m[5] * $y + m[6] * $z + m[7] * $w,
@@ -670,7 +702,8 @@ HYDROGEN.Matrix22.prototype {
         this.m[0] *= a;
         this.m[1] *= a;
         this.m[2] *= a;
-        this.m[3] *= a
+        this.m[3] *= a;
+        return this
     },
 
     multiplyScalarF: function(a) {
@@ -693,8 +726,8 @@ HYDROGEN.Matrix22.prototype {
         this.m[0] = m.m[0] * a + m.m[1] * c;
         this.m[1] = m.m[0] * b + m.m[1] * d;
         this.m[2] = m.m[2] * a + m.m[3] * c;
-        this.m[3] = m.m[2] * b + m.m[3] * d
-
+        this.m[3] = m.m[2] * b + m.m[3] * d;
+        return this
     },
 
     multiplyMatrix22F: function(m) {
@@ -768,6 +801,7 @@ HYDROGEN.Matrix33.prototype = {
         for (var i = 0; i < this.m.length; i++) {
             this.m[i] *= a;
         };
+        return this
     },
 
     multiplyScalarF: function(a) {
@@ -805,7 +839,8 @@ HYDROGEN.Matrix33.prototype = {
         c = m.m[6] * this.m[2] + m.m[7] * this.m[5] + m.m[8] * this.m[8];
         this.m[6] = a;
         this.m[7] = b;
-        this.m[8] = c
+        this.m[8] = c;
+        return this
     },
 
     multiplyMatrix33F: function(m) {
@@ -849,7 +884,8 @@ HYDROGEN.Matrix33.prototype = {
         c = v.z;
         v.x = this.m[0] * a + this.m[1] * b + this.get[2] * c;
         v.y = this.m[3] * a + this.m[4] * b + this.get[5] * c;
-        v.z = this.m[6] * a + this.m[7] * b + this.get[8] * c
+        v.z = this.m[6] * a + this.m[7] * b + this.get[8] * c;
+        return this
     },
 
     multiplyVector3F: function(v) {
@@ -913,15 +949,14 @@ HYDROGEN.Matrix44.prototype = {
         a = c[11];
         c[11] = c[14];
         c[14] = a;
-        return this;
-        h
-    }
+        return this
+    },
 
-        get: function(i) {
+    get: function(i) {
         return this.m[i]
-    }
+    },
 
-        setIdentity: function() {
+    setIdentity: function() {
         this.m[0] = 1;
         this.m[1] = 0;
         this.m[2] = 0;
@@ -945,6 +980,11 @@ HYDROGEN.Matrix44.prototype = {
         for (var i = 0; i < this.m.length; i++) {
             this.m[i] * a;
         };
+        return this
+    },
+
+    multiplyScalarF: function(a) {
+        // body...
     },
 
     multiplyMatrix44: function(m) {
