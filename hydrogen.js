@@ -11,6 +11,114 @@ Comments:
 //Create Hydrogen object
 var HYDROGEN = HYDROGEN || {}
 
+HYDROGEN.prototype {
+
+    var gl;
+    var canvas;
+    var shaderProgram;
+    //var shaderPrograms={}
+    var shaderVertexPositionAttribute;
+    var shaderProjectionMatrixUniform;
+    var shaderModelViewMatrixUniform;
+
+    //Shader section
+    var vSh_simple = {
+        type: "vertex",
+        str: "    attribute vec3 vertexPos;\n" +
+            "    uniform mat4 modelViewMatrix;\n" +
+            "    uniform mat4 projectionMatrix;\n" +
+            "    void main(void) {\n" +
+            "		// Return the transformed and projected vertex value\n" +
+            "        gl_Position = projectionMatrix * modelViewMatrix * \n" +
+            "            vec4(vertexPos, 1.0);\n" +
+            "    }\n"
+    };
+
+    var fSh_simple = {
+        type: "fragment",
+        str: "    void main(void) {\n" +
+            "    // Return the pixel color: always output white\n" +
+            "    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n" +
+            "}\n"
+    };
+
+    //Default objects
+
+    var square_v_ts = [
+        .5, .5, 0.0, -.5, .5, 0.0,
+        .5, -.5, 0.0, -.5, -.5, 0.0
+    ];
+
+    quickStart: function(canvas_name) {
+            initWebGL(canvas_name);
+            initViewPort()
+        },
+
+        initWebGL: function(canvas_name) {
+            var canvas = document.getElementById(canvas_name);
+            var gl;
+            try {
+                gl = canvas.getContext("experimental-webgl");
+            } catch (e) {
+                var msg = "Error creating WebGL Context!" + e.toString();
+                alert(msg);
+                throw Error(msg);
+            }
+            this.gl = gl;
+            this.canvas = canvas
+        },
+
+        initViewPort: function() {
+            this.gl.viewport(0, 0, canvas.width, canvas.height)
+        },
+
+        createShader: function(str, type) {
+            var shader;
+            if (type == 'fragment') {
+                shader = gl.createShader(gl.FRAGMENT_SHADER);
+            } else if (type == 'vertex') {
+                shader = gl.createShader(gl.VERTEX_SHADER);
+            } else {
+                return null;
+            }
+
+            gl.shaderSource(shader, str);
+            gl.compileShader(shader);
+
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                alert(gl.getShaderInfoLog(shader));
+                return null;
+            }
+
+            return shader
+        },
+
+        initShader: function(fragmentSS, vertexSS) {
+            var fragmentShader = createShader(gl, fragmentSS, "fragment");
+            var vertexShader = createShader(gl, vertexSS, "vertex");
+
+            // link them together into a new program
+            shaderProgram = gl.createProgram();
+            gl.attachShader(shaderProgram, vertexShader);
+            gl.attachShader(shaderProgram, fragmentShader);
+            gl.linkProgram(shaderProgram);
+
+            // get pointers to the shader params
+            shaderVertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPos");
+            gl.enableVertexAttribArray(shaderVertexPositionAttribute);
+
+            shaderProjectionMatrixUniform = gl.getUniformLocation(shaderProgram, "projectionMatrix");
+            shaderModelViewMatrixUniform = gl.getUniformLocation(shaderProgram, "modelViewMatrix");
+
+
+            if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+                alert("Could not initialise shaders");
+            }
+        }
+
+
+};
+
 //Define Vector2
 HYDROGEN.Vector2 = function(a, b) {
     this.x = a || 0;
@@ -36,14 +144,14 @@ HYDROGEN.Vector2.prototype {
     },
 
     getX: function() {
-        return this.x;
+        return this.x
     },
 
     getY: function() {
-        return this.y;
-    }
+        return this.y
+    },
 
-        copy: function(a) {
+    copy: function(a) {
         this.x = a.x;
         this.y = a.y;
         return this
@@ -72,10 +180,10 @@ HYDROGEN.Vector2.prototype {
     },
 
     subtractF: function(a) {
-        return new Vector2(this.x - a.x, this.y - a.y);
-    }
+        return new Vector2(this.x - a.x, this.y - a.y)
+    },
 
-        multiplyScalar: function(a) {
+    multiplyScalar: function(a) {
         this.x *= a;
         this.y *= a;
         return this
@@ -163,13 +271,15 @@ HYDROGEN.Vector3.prototype {
     },
 
     setX: function() {
-        return this.x;
+        return this.x
     },
+
     setY: function() {
-        return this.y;
+        return this.y
     },
+
     setZ: function() {
-        return this.z;
+        return this.z
     },
 
 
@@ -217,7 +327,7 @@ HYDROGEN.Vector3.prototype {
         return new Vector3(
             this.x - a.x,
             this.y - a.y,
-            this.z - a.z,
+            this.z - a.z
         )
     },
 
@@ -239,18 +349,24 @@ HYDROGEN.Vector3.prototype {
     addScaledVector: function(v, a) {
         this.x += a * v.x;
         this.y += a * v.y;
-        this.z += a * v.z;
-        return this
+        this.z += a * v.z
+    },
+
+    addScaledVectorF: function(v, a) {
+        return new Vector3(
+            this.x + v.x * a,
+            this.y + v.y * a,
+            this.z + v.z * a
+        )
     },
 
     divideScalar: function(a) {
-        a ? (this.x /= a, this.y /= a, this.z /= a) : this.z = this.y = this.x = 0;
-        return this
+        a ? (this.x /= a, this.y /= a, this.z /= a) : this.z = this.y = this.x = 0: ;
     },
 
-    divideScalar: function(a) {
+    divideScalarF: function(a) {
         a ?
-            return new Vector3(this.x /= a, this.y /= a, this.z /= a);
+            return new Vector3(this.x /= a, this.y /= a, this.z /= a): return new Vector3(0, 0, 0)
     },
 
     dot: function(v) {
@@ -302,11 +418,29 @@ HYDROGEN.Vector3.prototype {
     },
 
     multiplyMatrix33: function(m) {
-        //Multiply by matrix and change vector
+        // [0,1,2] [x]
+        // [3,4,5] [y]
+        // [6,7,8] [z]
+        var $x = this.x;
+        var $y = this.y;
+        var $z = this.z;
+
+        this.x = m[0] * $x + m[1] * $y + m[2] * $z;
+        this.y = m[3] * $x + m[4] * $y + m[5] * $z;
+        this.z = m[6] * $x + m[7] * $y + m[8] * $z
     },
 
     multiplyMatrix33F: function(m) {
-        //Multiply by matrix and return new vector
+        // [0,1,2] [x]
+        // [3,4,5] [y]
+        // [6,7,8] [z]
+        var $x = this.x;
+        var $y = this.y;
+        var $z = this.z;
+        return new Vector3(
+            this.x = m[0] * $x + m[1] * $y + m[2] * $z,
+            this.y = m[3] * $x + m[4] * $y + m[5] * $z,
+            this.z = m[6] * $x + m[7] * $y + m[8] * $z)
     }
 };
 
@@ -350,16 +484,19 @@ HYDROGEN.Vector4.prototype {
     },
 
     setX: function() {
-        return this.x;
+        return this.x
     },
+
     setY: function() {
-        return this.y;
+        return this.y
     },
+
     setZ: function() {
-        return this.z;
+        return this.z
     },
+
     setW: function() {
-        return this.w;
+        return this.w
     },
 
     copy: function(a) {
@@ -371,7 +508,7 @@ HYDROGEN.Vector4.prototype {
     },
 
     clone: function() {
-        return new wHYDROGEN.Vector4(this.x, this.y, this.z, this.w)
+        return new Vector4(this.x, this.y, this.z, this.w)
     },
 
     add: function(a) {
@@ -464,11 +601,37 @@ HYDROGEN.Vector4.prototype {
     },
 
     multiplyMatrix44: function(m) {
-        //Multiply by matrix and change vector
+        //[ 0, 1, 2, 3][x]
+        //[ 4, 5, 6, 7][y]
+        //[ 8, 9,10,11][z]
+        //[12,13,14,15][w]
+        var $x = this.x;
+        var $y = this.y;
+        var $z = this.z;
+        var $w = this.w;
+
+        this.x = m[0] * $x + m[1] * $y + m[2] * $z + m[3] * $w;
+        this.y = m[4] * $x + m[5] * $y + m[6] * $z + m[7] * $w;
+        this.z = m[8] * $x + m[9] * $y + m[10] * $z + m[11] * $w;
+        this.w = m[12] * $x + m[13] * $y + m[14] * $z + m[15] * $w
     },
 
     multiplyMatrix44F: function(m) {
-        //Multiply by matrix and return new vector
+        //[ 0, 1, 2, 3][x]
+        //[ 4, 5, 6, 7][y]
+        //[ 8, 9,10,11][z]
+        //[12,13,14,15][w]
+
+        var $x = this.x;
+        var $y = this.y;
+        var $z = this.z;
+        var $w = this.w;
+        
+        return new Vector4(
+            this.x = m[0] * $x + m[1] * $y + m[2] * $z + m[3] * $w,
+            this.y = m[4] * $x + m[5] * $y + m[6] * $z + m[7] * $w,
+            this.z = m[8] * $x + m[9] * $y + m[10] * $z + m[11] * $w,
+            this.w = m[12] * $x + m[13] * $y + m[14] * $z + m[15] * $w)
     }
 };
 
@@ -507,24 +670,46 @@ HYDROGEN.Matrix22.prototype {
         this.m[0] *= a;
         this.m[1] *= a;
         this.m[2] *= a;
-        this.m[3] *= a;
-        return this
+        this.m[3] *= a
+    },
+
+    multiplyScalarF: function(a) {
+        return new Matrix22(
+            this.m[0] *= a,
+            this.m[1] *= a,
+            this.m[2] *= a,
+            this.m[3] *= a
+        )
     },
 
     multiplyMatrix22: function(m) {
-        this.m[0] = a;
-        this.m[1] = b;
-        this.m[2] = c;
-        this.m[3] = d;
-        m.get(0) = k;
-        m.get(1) = l;
-        m.get(2) = m;
-        m.get(3) = n;
-        this.m[1] = k * a + l * c;
-        this.m[2] = k * b + l * d;
-        this.m[3] = m * a + n * c;
-        this.m[4] = m * b + n * d;
-        return this
+        //[0,1][a,b]
+        //[2,3][c,d]
+        var a = this.m[0];
+        var b = this.m[1];
+        var c = this.m[2];
+        var d = this.m[3];
+
+        this.m[0] = m.m[0] * a + m.m[1] * c;
+        this.m[1] = m.m[0] * b + m.m[1] * d;
+        this.m[2] = m.m[2] * a + m.m[3] * c;
+        this.m[3] = m.m[2] * b + m.m[3] * d
+
+    },
+
+    multiplyMatrix22F: function(m) {
+        //[0,1][a,b]
+        //[2,3][c,d]
+        var a = this.m[0];
+        var b = this.m[1];
+        var c = this.m[2];
+        var d = this.m[3];
+
+        return new Matrix22(
+            this.m[0] = m.m[0] * a + m.m[1] * c,
+            this.m[1] = m.m[0] * b + m.m[1] * d,
+            this.m[2] = m.m[2] * a + m.m[3] * c,
+            this.m[3] = m.m[2] * b + m.m[3] * d)
     },
 
     get: function(i) {
@@ -583,7 +768,13 @@ HYDROGEN.Matrix33.prototype = {
         for (var i = 0; i < this.m.length; i++) {
             this.m[i] *= a;
         };
-        return this
+    },
+
+    multiplyScalarF: function(a) {
+        var matrix = new Matrix33();
+        for (var i = 0; i < this.m.length; i++) {
+            matrix.m[i] = this.m[i] * a;
+        };
     },
 
     get: function(i) {
@@ -591,41 +782,91 @@ HYDROGEN.Matrix33.prototype = {
     },
 
     multiplyMatrix33: function(m) {
+        //[ 0, 1, 2][a,b,c]
+        //[ 3, 4, 5][d,e,f]
+        //[ 6, 7, 8][g,h,i]
         var a, b, c;
-        a = m.get(0) * this.m[0] + m.get(0) * this.m[1] + m.get(0) * this.m[2];
-        b = m.get(1) * this.m[3] + m.get(1) * this.m[4] + m.get(1) * this.m[5];
-        c = m.get(2) * this.m[6] + m.get(2) * this.m[7] + m.get(2) * this.m[8];
-        m[0] = a;
-        m[1] = b;
-        m[2] = c;
+        a = m.m[0] * this.m[0] + m.m[1] * this.m[3] + m.m[2] * this.m[6];
+        b = m.m[0] * this.m[1] + m.m[1] * this.m[4] + m.m[2] * this.m[7];
+        c = m.m[0] * this.m[2] + m.m[1] * this.m[5] + m.m[2] * this.m[8];
+        this.m[0] = a;
+        this.m[1] = b;
+        this.m[2] = c;
 
-        a = m.get(3) * this.m[0] + m.get(3) * this.m[1] + m.get(3) * this.m[2];
-        b = m.get(4) * this.m[3] + m.get(4) * this.m[4] + m.get(4) * this.m[5];
-        c = m.get(5) * this.m[6] + m.get(5) * this.m[7] + m.get(5) * this.m[8];
-        m[3] = a;
-        m[4] = b;
-        m[5] = c;
+        a = m.m[3] * this.m[0] + m.m[4] * this.m[3] + m.m[5] * this.m[6];
+        b = m.m[3] * this.m[1] + m.m[4] * this.m[4] + m.m[5] * this.m[7];
+        c = m.m[3] * this.m[2] + m.m[4] * this.m[5] + m.m[5] * this.m[8];
+        this.m[3] = a;
+        this.m[4] = b;
+        this.m[5] = c;
 
-        a = m.get(6) * this.m[0] + m.get(6) * this.m[1] + m.get(6) * this.m[2];
-        b = m.get(7) * this.m[3] + m.get(7) * this.m[4] + m.get(7) * this.m[5];
-        c = m.get(8) * this.m[6] + m.get(8) * this.m[7] + m.get(8) * this.m[8];
-        m[6] = a;
-        m[7] = b;
-        m[8] = c;
+        a = m.m[6] * this.m[0] + m.m[7] * this.m[3] + m.m[8] * this.m[6];
+        b = m.m[6] * this.m[1] + m.m[7] * this.m[4] + m.m[8] * this.m[7];
+        c = m.m[6] * this.m[2] + m.m[7] * this.m[5] + m.m[8] * this.m[8];
+        this.m[6] = a;
+        this.m[7] = b;
+        this.m[8] = c
+    },
 
-        return this
+    multiplyMatrix33F: function(m) {
+        //[ 0, 1, 2][a,b,c]
+        //[ 3, 4, 5][d,e,f]
+        //[ 6, 7, 8][g,h,i]
+        var a, b, c;
+        var matrix = new Matrix33();
+        a = m.m[0] * this.m[0] + m.m[1] * this.m[3] + m.m[2] * this.m[6];
+        b = m.m[0] * this.m[1] + m.m[1] * this.m[4] + m.m[2] * this.m[7];
+        c = m.m[0] * this.m[2] + m.m[1] * this.m[5] + m.m[2] * this.m[8];
+        matrix.m[0] = a;
+        matrix.m[1] = b;
+        matrix.m[2] = c;
+
+        a = m.m[3] * this.m[0] + m.m[4] * this.m[3] + m.m[5] * this.m[6];
+        b = m.m[3] * this.m[1] + m.m[4] * this.m[4] + m.m[5] * this.m[7];
+        c = m.m[3] * this.m[2] + m.m[4] * this.m[5] + m.m[5] * this.m[8];
+        matrix.m[3] = a;
+        matrix.m[4] = b;
+        matrix.m[5] = c;
+
+        a = m.m[6] * this.m[0] + m.m[7] * this.m[3] + m.m[8] * this.m[6];
+        b = m.m[6] * this.m[1] + m.m[7] * this.m[4] + m.m[8] * this.m[7];
+        c = m.m[6] * this.m[2] + m.m[7] * this.m[5] + m.m[8] * this.m[8];
+        matrix.m[6] = a;
+        matrix.m[7] = b;
+        matrix.m[8] = c;
+
+        return matrix
+
     },
 
     multiplyVector3: function(v) {
+        //[ 0, 1, 2][x]
+        //[ 3, 4, 5][y]
+        //[ 6, 7, 8][z]
+
         a = v.x;
         b = v.y;
         c = v.z;
-        v.x = this.get(0) * a + this.get(1) * b + this.get(2) * c;
-        v.y = this.get(3) * a + this.get(4) * b + this.get(5) * c;
-        v.z = this.get(6) * a + this.get(7) * b + this.get(8) * c;
-        return v
-    }
+        v.x = this.m[0] * a + this.m[1] * b + this.get[2] * c;
+        v.y = this.m[3] * a + this.m[4] * b + this.get[5] * c;
+        v.z = this.m[6] * a + this.m[7] * b + this.get[8] * c
+    },
+
+    multiplyVector3F: function(v) {
+        //[ 0, 1, 2][x]
+        //[ 3, 4, 5][y]
+        //[ 6, 7, 8][z]
+
+        a = v.x;
+        b = v.y;
+        c = v.z;
+        return new Vector3(
+            this.m[0] * a + this.m[1] * b + this.get[2] * c,
+            this.m[3] * a + this.m[4] * b + this.get[5] * c,
+            this.m[6] * a + this.m[7] * b + this.get[8] * c)
+    },
 };
+
 
 //Define Matrix44
 //For reference, array indices relate to following matrix elements
@@ -1169,33 +1410,7 @@ HYDROGEN.CollisionDetector2D.prototype = {
     },
 
     AABB2D_AABB2: function(a, b) {
-        var a_xmax, a_xmin;
-        var b_xmax, b_xmin;
-        var a_ymax, a_ymin;
-        var b_ymax, b_ymin;
-        var av, bv;
-
-        av = a.getV();
-        bv = b.getV();
-
-        a_xmin = a_xmax = av.getX();
-        a_xmax += a.getHX();
-        a_xmin -= a.getHX();
-
-        b_xmin = b_xmax = bv.getX();
-        b_xmax += b.getHX();
-        b_xmin -= b.getHX();
-
-        a_ymin = a_ymax = av.getY();
-        a_ymax += a.getHY();
-        a_ymin -= a.getHY();
-
-        b_ymin = b_ymax = bv.getY();
-        b_ymax += b.getHY();
-        b_ymin -= b.getHY();
-
-        return a_xmax > b_xmin && a_xmin > b_xmax || a_ymax > b_ymin && a_ymin > b_ymax;
-
+        return 2 * Math.abs(a.v.x - b.v.x) < a.hx + b.hx && 2 * Math.abs(a.v.y - b.v.y) < a.hy + b.hy;
     },
 
     OABB2D_OABB2D: function(a, b) {
@@ -1221,11 +1436,11 @@ HYDROGEN.CollisionDetector3D.prototype = {
         },
 
         function BoundingSphere3D_BoundingSphere3D(a, b) {
-            return false;
+            return (a.r + b.r) * (a.r + b.r) < a.v.subtractF(b.v).lengthSquared();
         },
 
         function AABB3D_AABB3D(a, b) {
-            return false;
+            return 2 * Math.abs(a.v.x - b.v.x) < a.hx + b.hx && 2 * Math.abs(a.v.y - b.v.y) < a.hy + b.hy && 2 * Math.abs(a.v.z - b.v.z) < a.hz + b.hz;
         },
 
         function OABB3D_OABB3D(a, b) {
