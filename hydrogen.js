@@ -13,6 +13,8 @@ var HYDROGEN = HYDROGEN || {}
 
 HYDROGEN.prototype {
 
+    constructor: HYDROGEN,
+
     var gl;
     var canvas;
     var shaderProgram;
@@ -49,72 +51,72 @@ HYDROGEN.prototype {
         .5, -.5, 0.0, -.5, -.5, 0.0
     ];
 
-        quickStart: function(canvas_name) {
-            initWebGL(canvas_name);
-            initViewPort()
-        },
+    quickStart: function(canvas_name) {
+        initWebGL(canvas_name);
+        initViewPort()
+    },
 
-        initWebGL: function(canvas_name) {
-            var canvas = document.getElementById(canvas_name);
-            var gl;
-            try {
-                gl = canvas.getContext("experimental-webgl");
-            } catch (e) {
-                var msg = "Error creating WebGL Context!" + e.toString();
-                alert(msg);
-                throw Error(msg);
-            }
-            this.gl = gl;
-            this.canvas = canvas
-        },
-
-        initViewPort: function() {
-            this.gl.viewport(0, 0, canvas.width, canvas.height)
-        },
-
-        createShader: function(str, type) {
-            var shader;
-            if (type == 'fragment') {
-                shader = gl.createShader(gl.FRAGMENT_SHADER);
-            } else if (type == 'vertex') {
-                shader = gl.createShader(gl.VERTEX_SHADER);
-            } else {
-                return null;
-            }
-
-            gl.shaderSource(shader, str);
-            gl.compileShader(shader);
-
-            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                alert(gl.getShaderInfoLog(shader));
-                return null;
-            }
-
-            return shader
-        },
-
-        initShader: function(fragmentSS, vertexSS) {
-            var fragmentShader = createShader(gl, fragmentSS, "fragment");
-            var vertexShader = createShader(gl, vertexSS, "vertex");
-
-            // link them together into a new program
-            shaderProgram = gl.createProgram();
-            gl.attachShader(shaderProgram, vertexShader);
-            gl.attachShader(shaderProgram, fragmentShader);
-            gl.linkProgram(shaderProgram);
-
-            // get pointers to the shader params
-            shaderVertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPos");
-            gl.enableVertexAttribArray(shaderVertexPositionAttribute);
-
-            shaderProjectionMatrixUniform = gl.getUniformLocation(shaderProgram, "projectionMatrix");
-            shaderModelViewMatrixUniform = gl.getUniformLocation(shaderProgram, "modelViewMatrix");
-
-
-            if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-                alert("Could not initialise shaders");
-            }
+    initWebGL: function(canvas_name) {
+        var canvas = document.getElementById(canvas_name);
+        var gl;
+        try {
+            gl = canvas.getContext("experimental-webgl");
+        } catch (e) {
+            var msg = "Error creating WebGL Context!" + e.toString();
+            alert(msg);
+            throw Error(msg);
         }
+        this.gl = gl;
+        this.canvas = canvas
+    },
+
+    initViewPort: function() {
+        this.gl.viewport(0, 0, canvas.width, canvas.height)
+    },
+
+    createShader: function(str, type) {
+        var shader;
+        if (type == 'fragment') {
+            shader = gl.createShader(gl.FRAGMENT_SHADER);
+        } else if (type == 'vertex') {
+            shader = gl.createShader(gl.VERTEX_SHADER);
+        } else {
+            return null;
+        }
+
+        gl.shaderSource(shader, str);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            alert(gl.getShaderInfoLog(shader));
+            return null;
+        }
+
+        return shader
+    },
+
+    initShader: function(fragmentSS, vertexSS) {
+        var fragmentShader = createShader(gl, fragmentSS, "fragment");
+        var vertexShader = createShader(gl, vertexSS, "vertex");
+
+        // link them together into a new program
+        shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+
+        // get pointers to the shader params
+        shaderVertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPos");
+        gl.enableVertexAttribArray(shaderVertexPositionAttribute);
+
+        shaderProjectionMatrixUniform = gl.getUniformLocation(shaderProgram, "projectionMatrix");
+        shaderModelViewMatrixUniform = gl.getUniformLocation(shaderProgram, "modelViewMatrix");
+
+
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+            alert("Could not initialise shaders");
+        }
+    }
 
 
 };
@@ -747,7 +749,28 @@ HYDROGEN.Matrix22.prototype {
 
     get: function(i) {
         return this.m[i]
-    }
+    },
+
+    setRotationMatrix: function(alpha) {
+        var cos = Math.cos(alpha / (2 * Math.PI));
+        var sin = Math.sin(alpha / (2 * Math.PI));
+
+        this.m[0] = cos;
+        this.m[1] = -sin;
+        this.m[2] = sin;
+        this.m[3] = cos;
+    };
+};
+HYDROGEN.Matrix22.getRotation = function(alpha) {
+    var matrix = new Matrix22();
+
+    var cos = Math.cos(alpha / (2 * Math.PI));
+    var sin = Math.sin(alpha / (2 * Math.PI));
+
+    matrix.m[0] = cos;
+    matrix.m[1] = -sin;
+    matrix.m[2] = sin;
+    matrix.m[3] = cos;
 };
 
 //Define Matrix33
@@ -984,15 +1007,91 @@ HYDROGEN.Matrix44.prototype = {
     },
 
     multiplyScalarF: function(a) {
-        // body...
+        var matrix = new Matrix44();
+        for (var i = 0; i < this.m.length; i++) {
+            matrix.m[i]
+        };
+        return matrix;
     },
 
     multiplyMatrix44: function(m) {
-        // body...
+        //[ 0, 1, 2, 3][ 0, 1, 2, 3]
+        //[ 4, 5, 6, 7][ 4, 5, 6, 7]
+        //[ 8, 9,10,11][ 8, 9,10,11]
+        //[12,13,14,15][12,13,14,15]
+
+        var a, b, c, d;
+
+        a = m.m[0] * this.m[0] + m.m[1] * this.m[4] + m.m[2] * this.m[8] + m.m[3] * this.m[12];
+        b = m.m[0] * this.m[1] + m.m[1] * this.m[5] + m.m[2] * this.m[9] + m.m[3] * this.m[13];
+        c = m.m[0] * this.m[2] + m.m[1] * this.m[6] + m.m[2] * this.m[10] + m.m[3] * this.m[14];
+        d = m.m[0] * this.m[3] + m.m[1] * this.m[7] + m.m[2] * this.m[11] + m.m[3] * this.m[15];
+        this.m[0] = a;
+        this.m[1] = b;
+        this.m[2] = c;
+        this.m[3] = d;
+
+        a = m.m[4] * this.m[0] + m.m[5] * this.m[4] + m.m[6] * this.m[8] + m.m[7] * this.m[12];
+        b = m.m[4] * this.m[1] + m.m[5] * this.m[5] + m.m[6] * this.m[9] + m.m[7] * this.m[13];
+        c = m.m[4] * this.m[2] + m.m[5] * this.m[6] + m.m[6] * this.m[10] + m.m[7] * this.m[14];
+        d = m.m[4] * this.m[3] + m.m[5] * this.m[7] + m.m[6] * this.m[11] + m.m[7] * this.m[15];
+        this.m[4] = a;
+        this.m[5] = b;
+        this.m[6] = c;
+        this.m[7] = d;
+
+        a = m.m[8] * this.m[0] + m.m[9] * this.m[4] + m.m[10] * this.m[8] + m.m[11] * this.m[12];
+        b = m.m[8] * this.m[1] + m.m[9] * this.m[5] + m.m[10] * this.m[9] + m.m[11] * this.m[13];
+        c = m.m[8] * this.m[2] + m.m[9] * this.m[6] + m.m[10] * this.m[10] + m.m[11] * this.m[14];
+        d = m.m[8] * this.m[3] + m.m[9] * this.m[7] + m.m[10] * this.m[11] + m.m[11] * this.m[15];
+        this.m[8] = a;
+        this.m[9] = b;
+        this.m[10] = c;
+        this.m[11] = d;
+
+        a = m.m[12] * this.m[0] + m.m[13] * this.m[4] + m.m[14] * this.m[8] + m.m[15] * this.m[12];
+        b = m.m[12] * this.m[1] + m.m[13] * this.m[5] + m.m[14] * this.m[9] + m.m[15] * this.m[13];
+        c = m.m[12] * this.m[2] + m.m[13] * this.m[6] + m.m[14] * this.m[10] + m.m[15] * this.m[14];
+        d = m.m[12] * this.m[3] + m.m[13] * this.m[7] + m.m[14] * this.m[11] + m.m[15] * this.m[15];
+        this.m[12] = a;
+        this.m[13] = b;
+        this.m[14] = c;
+        this.m[15] = d;
+
+        return this;
+
     },
 
     multiplyMatrix44F: function(m) {
-        // body...
+        //[ 0, 1, 2, 3][ 0, 1, 2, 3]
+        //[ 4, 5, 6, 7][ 4, 5, 6, 7]
+        //[ 8, 9,10,11][ 8, 9,10,11]
+        //[12,13,14,15][12,13,14,15]
+
+        var matrix = new Matrix44();
+
+        matrix.m[0] = m.m[0] * this.m[0] + m.m[1] * this.m[4] + m.m[2] * this.m[8] + m.m[3] * this.m[12];
+        matrix.m[1] = m.m[0] * this.m[1] + m.m[1] * this.m[5] + m.m[2] * this.m[9] + m.m[3] * this.m[13];
+        matrix.m[2] = m.m[0] * this.m[2] + m.m[1] * this.m[6] + m.m[2] * this.m[10] + m.m[3] * this.m[14];
+        matrix.m[3] = m.m[0] * this.m[3] + m.m[1] * this.m[7] + m.m[2] * this.m[11] + m.m[3] * this.m[15];
+
+        matrix.m[4] = m.m[4] * this.m[0] + m.m[5] * this.m[4] + m.m[6] * this.m[8] + m.m[7] * this.m[12];
+        matrix.m[5] = m.m[4] * this.m[1] + m.m[5] * this.m[5] + m.m[6] * this.m[9] + m.m[7] * this.m[13];
+        matrix.m[6] = m.m[4] * this.m[2] + m.m[5] * this.m[6] + m.m[6] * this.m[10] + m.m[7] * this.m[14];
+        matrix.m[7] = m.m[4] * this.m[3] + m.m[5] * this.m[7] + m.m[6] * this.m[11] + m.m[7] * this.m[15];
+
+        matrix.m[8] = m.m[8] * this.m[0] + m.m[9] * this.m[4] + m.m[10] * this.m[8] + m.m[11] * this.m[12];
+        matrix.m[9] = m.m[8] * this.m[1] + m.m[9] * this.m[5] + m.m[10] * this.m[9] + m.m[11] * this.m[13];
+        matrix.m[10] = m.m[8] * this.m[2] + m.m[9] * this.m[6] + m.m[10] * this.m[10] + m.m[11] * this.m[14];
+        matrix.m[11] = m.m[8] * this.m[3] + m.m[9] * this.m[7] + m.m[10] * this.m[11] + m.m[11] * this.m[15];
+
+        matrix.m[12] = m.m[12] * this.m[0] + m.m[13] * this.m[4] + m.m[14] * this.m[8] + m.m[15] * this.m[12];
+        matrix.m[13] = m.m[12] * this.m[1] + m.m[13] * this.m[5] + m.m[14] * this.m[9] + m.m[15] * this.m[13];
+        matrix.m[14] = m.m[12] * this.m[2] + m.m[13] * this.m[6] + m.m[14] * this.m[10] + m.m[15] * this.m[14];
+        matrix.m[15] = m.m[12] * this.m[3] + m.m[13] * this.m[7] + m.m[14] * this.m[11] + m.m[15] * this.m[15];
+
+        return matrix;
+
     }
 };
 
@@ -1463,27 +1562,117 @@ HYDROGEN.CollisionDetector3D = function() {
     // body...
 };
 HYDROGEN.CollisionDetector3D.prototype = {
+
+    constructor: HYDROGEN.CollisionDetector3D,
+
     function checkForCollision(a, b) {
-            if a instanceof BoundingSphere3D && b instanceof BoundingSphere3D {
-                return BoundingSphere3D_BoundingSphere3D(a, b);
-            } else if a instanceof AABB3D && b instanceof AABB3D {
-                return AABB3D_AABB3D(a, b);
-            } else if c {
-                return OABB3D_OABB3D(a, b);
-            } else {
-                return false;
-            }
-        },
-
-        function BoundingSphere3D_BoundingSphere3D(a, b) {
-            return (a.r + b.r) * (a.r + b.r) < a.v.subtractF(b.v).lengthSquared();
-        },
-
-        function AABB3D_AABB3D(a, b) {
-            return 2 * Math.abs(a.v.x - b.v.x) < a.hx + b.hx && 2 * Math.abs(a.v.y - b.v.y) < a.hy + b.hy && 2 * Math.abs(a.v.z - b.v.z) < a.hz + b.hz;
-        },
-
-        function OABB3D_OABB3D(a, b) {
+        if a instanceof BoundingSphere3D && b instanceof BoundingSphere3D {
+            return BoundingSphere3D_BoundingSphere3D(a, b);
+        } else if a instanceof AABB3D && b instanceof AABB3D {
+            return AABB3D_AABB3D(a, b);
+        } else if c {
+            return OABB3D_OABB3D(a, b);
+        } else {
             return false;
         }
+    },
+
+    function BoundingSphere3D_BoundingSphere3D(a, b) {
+        return (a.r + b.r) * (a.r + b.r) < a.v.subtractF(b.v).lengthSquared();
+    },
+
+    function AABB3D_AABB3D(a, b) {
+        return 2 * Math.abs(a.v.x - b.v.x) < a.hx + b.hx && 2 * Math.abs(a.v.y - b.v.y) < a.hy + b.hy && 2 * Math.abs(a.v.z - b.v.z) < a.hz + b.hz;
+    },
+
+    function OABB3D_OABB3D(a, b) {
+        return false;
+    }
+};
+
+//Define 2D Scene object
+HYDROGEN.Scene2D = function() {
+
+};
+HYDROGEN.Scene2D.prototype = {
+
+};
+
+//Define 3D Scene object
+HYDROGEN.Scene3D = function() {
+
+};
+HYDROGEN.Scene3D.prototype = {
+
+};
+
+//Define 2D Object
+HYDROGEN.Object2D = function() {
+
+};
+HYRDOGEN.Object2D.prototype = {
+    
+    constructor: Hydrogen.Object2D,
+
+    //Physical properies
+    var position = new Vector2();
+    var velocity = new Vector2();
+    var orientation = 0.0;
+    var angular_velocity = 0.0;
+    var mass = 0.0;
+    var collision_geometry;
+
+    //Visible properties
+
+    setPosition: function(x, y) {
+        this.position[0] = x;
+        this.position[1] = y
+    },
+
+    setVelocity: function(x, y) {
+        this.velocity[0] = x;
+        this.velocity[1] = y
+    },
+
+    setOrientation: function(alpha) {
+        this.orientation = alpha
+    },
+
+    setAngularVelocity: function(a) {
+        this.angular_velocity = a
+    },
+
+    setMass: function(m) {
+        this.mass = m
+    },
+
+    iterate: function(dt) {
+        this.position.addScaledVector(this.velocity, dt);
+        this.orientation += angular_velocity * dt
+    }
+};
+
+//Define 3D Object
+HYDROGEN.Object3D = function() {
+
+};
+HYDROGEN.Object3D.prototype = {
+
+};
+
+//Define 2D camera object (viewport)
+HYDROGEN.Camera2D = function() {
+
+};
+HYDROGEN.Camera2D.prototype = {
+
+};
+
+//Define 3D camera object
+HYDROGEN.Camera3D = function() {
+
+};
+
+HYDROGEN.Camera3D.prototype = {
+
 };
