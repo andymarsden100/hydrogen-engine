@@ -1611,7 +1611,7 @@ HYDROGEN.Object2D = function() {
 
 };
 HYRDOGEN.Object2D.prototype = {
-    
+
     constructor: Hydrogen.Object2D,
 
     //Physical properies
@@ -1622,7 +1622,9 @@ HYRDOGEN.Object2D.prototype = {
     var mass = 0.0;
     var collision_geometry;
 
-    //Visible properties
+    //Material properties
+
+    //Mesh
 
     setPosition: function(x, y) {
         this.position[0] = x;
@@ -1658,6 +1660,21 @@ HYDROGEN.Object3D = function() {
 };
 HYDROGEN.Object3D.prototype = {
 
+    constructor: HYDROGEN.Object3D,
+
+    //Physical properies
+    var position = new Vector3();
+    var velocity = new Vector3();
+    var orientation = new Quarternion();
+    var angular_velocity = new Vector3();
+    var mass = new Matrix33();
+    var collision_geometry
+
+    //Material properties
+
+
+    //Mesh
+
 };
 
 //Define 2D camera object (viewport)
@@ -1676,3 +1693,167 @@ HYDROGEN.Camera3D = function() {
 HYDROGEN.Camera3D.prototype = {
 
 };
+
+HYDROGEN.Shapes.Cylinder = function(l, r, b, drawElements) {
+    var length = l || 0.5; //half length
+    var radius = r || 0.25; //radius
+    var num = n || 10; //Number of vertices round circumference
+    var vert = [];
+
+    if (typeof drawElements === "undefined") {
+        drawElements = "TRIANGLES"
+    };
+
+    switch (drawElements) {
+        case "TRIANGLES":
+
+            //Top disc
+            for (var i = 0; i < num - 1; i++) {
+
+                var xfrom = r * Math.sin(i * 2 * Math.PI / num);
+                var xto = r * Math.sin((i + 1) * 2 * Math.PI / num);
+                var yfrom = r * Math.cos(i * 2 * Math.PI / num);
+                var yto = r * Math.cos((i + 1) * 2 * Math.PI / num);
+
+                //Top disc
+                vert[i] = new Vector3(0, 0, l);
+                vert[i + 1] = new Vector3(xto, yto, l);
+                vert[i + 2] = new Vector3(xfrom, yfrom, l);
+
+                //Sides
+                vert[i + 3] = new Vector3(xfrom, yfrom, l);
+                vert[i + 4] = new Vector3(xto, yto, l);
+                vert[i + 5] = new Vector3(xfrom, yfrom, -l);
+                vert[i + 6] = new Vector3(xto, yto, l);
+                vert[i + 7] = new Vector3(xto, yto, -l);
+                vert[i + 8] = new Vector3(xfrom, yfrom, -l);
+
+                //Bottom disc
+                vert[i + 9] = new Vector3(0, 0, -l);
+                vert[i + 10] = new Vector3(xfrom, yfrom, -l);
+                vert[i + 11] = new Vector3(xto, yto, -l);
+
+            };
+            break;
+        case "POINTS":
+            //Generate vertices
+            for (var i = 0; i < num - 1; i++) {
+                var sin = Math.sin(2 * i * Math.PI / num);
+                var cos = Math.cos(2 * i * Math.PI / num);
+                vert[i] = new Vector3(r * sin, r * cos, l);
+                vert[i + num] = new Vector3(r * sin, r * cos, -l);
+            };
+            break;
+    }
+
+
+    result = {};
+    resut.draw_type = drawElements;
+    result.vertices = vert;
+
+    return result;
+
+};
+
+HYDROGEN.Shapes.Sphere = function(r, n, m) {
+    var radius = r || 0.5;
+    var latitude = n || 5;
+    var longitude = m || 5;
+    var vert = [];
+
+    //Loop to generate vertices
+
+    result = {};
+    result.draw_type = "POINTS";
+    result.vertices = vert;
+
+    for (var i = 0; i < latitude; i++) {
+        for (var j = 0; j < longitude - 1; j++) {
+            vert[i * longitude + latitude] = new Vector3();
+        };
+    };
+
+    result = {};
+    resut.draw_type = "POINTS";
+    result.vertices = vert;
+
+
+    return result;
+};
+
+HYDROGEN.Shapes.Box = function(x, y, z, drawElements) {
+    var x_half = x || 0.5;
+    var y_half = y || 0.5;
+    var z_half = z || 0.5;
+    var vert = []
+
+    if (typeof drawElements === "undefined") {
+        drawElements = "TRIANGLES"
+    };
+
+    switch (drawElements) {
+        case "TRIANGLES":
+            //TOP
+            verts[0] = new Vector3(,,);
+            verts[1] = new Vector3(,,);
+            verts[2] = new Vector3(,,);
+            verts[3] = new Vector3(,,);
+            verts[4] = new Vector3(,,);
+            verts[5] = new Vector3(,,);
+            //Side 1
+            verts[6] = new Vector3(,,);
+            verts[7] = new Vector3(,,);
+            verts[8] = new Vector3(,,);
+            verts[9] = new Vector3(,,);
+            verts[10] = new Vector3(,,);
+            verts[11] = new Vector3(,,);
+            //Side 2
+            verts[12] = new Vector3(,,);
+            verts[13] = new Vector3(,,);
+            verts[14] = new Vector3(,,);
+            verts[15] = new Vector3(,,);
+            verts[16] = new Vector3(,,);
+            verts[17] = new Vector3(,,);
+            //Side 3
+            verts[18] = new Vector3(,,);
+            verts[19] = new Vector3(,,);
+            verts[20] = new Vector3(,,);
+            verts[21] = new Vector3(,,);
+            verts[22] = new Vector3(,,);
+            verts[23] = new Vector3(,,);
+            //Side 4
+            verts[24] = new Vector3(,,);
+            verts[25] = new Vector3(,,);
+            verts[26] = new Vector3(,,);
+            verts[27] = new Vector3(,,);
+            verts[28] = new Vector3(,,);
+            verts[29] = new Vector3(,,);
+            //Bottom
+            verts[30] = new Vector3(,,);
+            verts[31] = new Vector3(,,);
+            verts[32] = new Vector3(,,);
+            verts[33] = new Vector3(,,);
+            verts[34] = new Vector3(,,);
+            verts[35] = new Vector3(,,);
+
+            break;
+        case "POINTS":
+            vert[0] = new Vector3(x_half, y_half, z_half);
+            vert[1] = new Vector3(-x_half, +y_half, z_half);
+            vert[2] = new Vector3(-x_half, -y_half, z_half);
+            vert[3] = new Vector3(x_half, -y_half, z_half);
+            vert[4] = new Vector3(x_half, y_half, -z_half);
+            vert[5] = new Vector3(-x_half, y_half, -z_half);
+            vert[6] = new Vector3(-x_half, -y_half, -z_half);
+            vert[7] = new Vector3(x_half, -y_half, -z_half);
+            break;
+    }
+
+
+    result = {};
+    resut.draw_type = drawElements;
+    result.vertices = vert;
+
+    return result;
+
+}
