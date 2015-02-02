@@ -9,52 +9,57 @@ Comments:
 */
 
 //Create Hydrogen object
-var HYDROGEN = HYDROGEN || {};
+//var HYDROGEN = HYDROGEN || {};
 
-HYDROGEN.prototype {
+HYDROGEN=function(){
+    //pass
+};
+
+HYDROGEN.prototype = {
 
     constructor: HYDROGEN,
 
-    var gl;
-    var canvas;
-    var canvas_name;
-    var shaderProgram;
+    VERSION:1.0,
+    gl: null,
+    canvas: null,
+    canvas_name: null,
+    shaderProgram: null,
     //var shaderPrograms={}
-    var shaderVertexPositionAttribute;
-    var shaderProjectionMatrixUniform;
-    var shaderModelViewMatrixUniform;
+    shaderVertexPositionAttribute: null,
+    shaderProjectionMatrixUniform: null,
+    shaderModelViewMatrixUniform: null,
 
     //Shader section
-    var vSh_simple = {
+    vSh_simple: {
         type: "vertex",
         str: "    attribute vec3 vertexPos;\n" +
             "    uniform mat4 modelViewMatrix;\n" +
             "    uniform mat4 projectionMatrix;\n" +
             "    void main(void) {\n" +
-            "		// Return the transformed and projected vertex value\n" +
+            "       // Return the transformed and projected vertex value\n" +
             "        gl_Position = projectionMatrix * modelViewMatrix * \n" +
             "            vec4(vertexPos, 1.0);\n" +
             "    }\n"
-    };
+    },
 
-    var fSh_simple = {
+    fSh_simple: {
         type: "fragment",
         str: "    void main(void) {\n" +
             "    // Return the pixel color: always output white\n" +
             "    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n" +
             "}\n"
-    };
+    },
 
     //Default objects
 
-    var square_v_ts = [
+    square_v_ts: [
         .5, .5, 0.0, -.5, .5, 0.0,
         .5, -.5, 0.0, -.5, -.5, 0.0
-    ];
+    ],
 
     quickStart: function(canvas_name) {
-        initWebGL(canvas_name);
-        initViewPort()
+        this.initWebGL(canvas_name);
+        this.initViewPort()
     },
 
     initWebGL: function(canvas_name) {
@@ -69,29 +74,33 @@ HYDROGEN.prototype {
         }
         this.gl = gl;
         this.canvas = canvas;
-        this.canvas_name=canvas_name
+        this.canvas_name = canvas_name
         canvas.appendChild(document.createTextNode("initWebGL"))
     },
 
     initViewPort: function() {
-        this.gl.viewport(0, 0, canvas.width, canvas.height)
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height)
     },
 
     createShader: function(str, type) {
+        //console.log("createShader has been called");
+        //console.log("type:"+type);
+        //console.log("str:"+str);
         var shader;
-        if (type == 'fragment') {
-            shader = gl.createShader(gl.FRAGMENT_SHADER);
-        } else if (type == 'vertex') {
-            shader = gl.createShader(gl.VERTEX_SHADER);
+        if (type == "fragment") {
+            shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
+        } else if (type == "vertex") {
+            //console.log("requested a vertex shader");
+            shader = this.gl.createShader(this.gl.VERTEX_SHADER);
         } else {
             return null;
         }
 
-        gl.shaderSource(shader, str);
-        gl.compileShader(shader);
+        this.gl.shaderSource(shader, str);
+        this.gl.compileShader(shader);
 
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            alert(gl.getShaderInfoLog(shader));
+        if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+            alert(this.gl.getShaderInfoLog(shader));
             return null;
         }
 
@@ -99,24 +108,25 @@ HYDROGEN.prototype {
     },
 
     initShader: function(fragmentSS, vertexSS) {
-        var fragmentShader = createShader(gl, fragmentSS, "fragment");
-        var vertexShader = createShader(gl, vertexSS, "vertex");
+        var fragmentShader = this.createShader(fragmentSS, "fragment");
+        var vertexShader = this.createShader(vertexSS, "vertex");
 
-        // link them together into a new program
-        shaderProgram = gl.createProgram();
-        gl.attachShader(shaderProgram, vertexShader);
-        gl.attachShader(shaderProgram, fragmentShader);
-        gl.linkProgram(shaderProgram);
+        // link them together into a new programd
+        this.shaderProgram = this.gl.createProgram();
+        //this.shaderProgram===null?console.log("shaderProgram is null"):console.log("vertexShader is null");
+        this.gl.attachShader(this.shaderProgram, vertexShader);
+        this.gl.attachShader(this.shaderProgram, fragmentShader);
+        this.gl.linkProgram(this.shaderProgram);
 
         // get pointers to the shader params
-        shaderVertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPos");
-        gl.enableVertexAttribArray(shaderVertexPositionAttribute);
+        shaderVertexPositionAttribute = this.gl.getAttribLocation(this.shaderProgram, "vertexPos");
+        this.gl.enableVertexAttribArray(shaderVertexPositionAttribute);
 
-        shaderProjectionMatrixUniform = gl.getUniformLocation(shaderProgram, "projectionMatrix");
-        shaderModelViewMatrixUniform = gl.getUniformLocation(shaderProgram, "modelViewMatrix");
+        shaderProjectionMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "projectionMatrix");
+        shaderModelViewMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "modelViewMatrix");
 
 
-        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+        if (!this.gl.getProgramParameter(this.shaderProgram, this.gl.LINK_STATUS)) {
             alert("Could not initialise shaders");
         }
     }
@@ -129,7 +139,7 @@ HYDROGEN.Vector2 = function(a, b) {
     this.x = a || 0;
     this.y = b || 0
 };
-HYDROGEN.Vector2.prototype {
+HYDROGEN.Vector2.prototype = {
     constructor: HYDROGEN.Vector2,
 
     set: function(a, b) {
@@ -265,7 +275,7 @@ HYDROGEN.Vector3 = function(a, b, c) {
     this.y = b || 0;
     this.z = c || 0
 };
-HYDROGEN.Vector3.prototype {
+HYDROGEN.Vector3.prototype = {
 
     constructor: HYDROGEN.Vector3,
 
@@ -370,8 +380,8 @@ HYDROGEN.Vector3.prototype {
     addScaledVector: function(v, a) {
         this.x += a * v.x;
         this.y += a * v.y;
-        this.z += a * v.z,
-            return this
+        this.z += a * v.z;
+        return this
     },
 
     addScaledVectorF: function(v, a) {
@@ -383,13 +393,13 @@ HYDROGEN.Vector3.prototype {
     },
 
     divideScalar: function(a) {
-        a ? (this.x /= a, this.y /= a, this.z /= a) : this.z = this.y = this.x = 0: ;
+        a ? (this.x /= a, this.y /= a, this.z /= a) : this.z = this.y = this.x = 0;
         return this
     },
 
     divideScalarF: function(a) {
-        a ?
-            return new Vector3(this.x /= a, this.y /= a, this.z /= a): return new Vector3(0, 0, 0)
+        return a ?
+            new Vector3(this.x /= a, this.y /= a, this.z /= a) : new Vector3(0, 0, 0)
     },
 
     dot: function(v) {
@@ -475,7 +485,7 @@ HYDROGEN.Vector4 = function(a, b, c, d) {
     this.z = c || 0;
     this.w = d || 0
 };
-HYDROGEN.Vector4.prototype {
+HYDROGEN.Vector4.prototype = {
 
     constructor: HYDROGEN.Vector4,
 
@@ -683,7 +693,7 @@ HYDROGEN.Matrix22 = function(a, b, c, d) {
     this.m[2] = c !== void 0 ? c : 0;
     this.m[3] = d !== void 0 ? d : 1;
 };
-HYDROGEN.Matrix22.prototype {
+HYDROGEN.Matrix22.prototype = {
 
     constructor: HYDROGEN.Matrix22,
 
@@ -762,7 +772,7 @@ HYDROGEN.Matrix22.prototype {
         this.m[1] = -sin;
         this.m[2] = sin;
         this.m[3] = cos;
-    };
+    }
 };
 HYDROGEN.Matrix22.getRotation = function(alpha) {
     var matrix = new Matrix22();
@@ -1321,13 +1331,13 @@ HYDROGEN.AABB3D.prototype = {
             y = vlist[i].getY();
             z = vlist[i].getZ();
 
-            if xmax == void 0 ? xmax = x : if x > xmax ? xmax = x;
-            if ymax == void 0 ? ymax = y : if y > ymax ? ymax = y;
-            if zmax == void 0 ? zmax = z : if z > zmax ? zmax = z;
+            xmax == void 0 ? xmax = x : x > xmax ? xmax = x : xmax = xmax;
+            ymax == void 0 ? ymax = y : y > ymax ? ymax = y : ymax = ymax;
+            zmax == void 0 ? zmax = z : z > zmax ? zmax = z : zmax = zmax;
 
-            if xmin == void 0 ? xmin = x : if x < xmin ? xmin = x;
-            if ymin == void 0 ? ymin = y : if y < ymin ? ymin = y;
-            if zmin == void 0 ? zmin = z : if z < zmin ? zmin = z;
+            xmin == void 0 ? xmin = x : x < xmin ? xmin = x : xmin = xmin;
+            ymin == void 0 ? ymin = y : y < ymin ? ymin = y : ymin = ymin;
+            zmin == void 0 ? zmin = z : z < zmin ? zmin = z : zmin = zmin;
         };
 
         this.hx = (xmax - xmin) / 2;
@@ -1365,11 +1375,11 @@ HYDROGEN.BoundingCylinder3D.prototype = {
 
 //Define Bounding Plane in 3D
 HYDROGEN.BoundingPlane3D = function(p, n) {
-    if p !== void 0 ? this.p = p : this.p = new Vector3();
-    if n !== void 0 ? this.n = n : this.n = new Vector3(0, 0, 1)
+    p !== void 0 ? this.p = p : this.p = new Vector3();
+    n !== void 0 ? this.n = n : this.n = new Vector3(0, 0, 1)
 };
 HYDROGEN.BoundingPlane3D.prototype = {
-    constructor: HYDROGEN.BoundingPlane3D
+    constructor: HYDROGEN.BoundingPlane3D,
     distance: function(v) {
         return this.n.dot(v.subtractF(this.p));
     }
@@ -1452,11 +1462,11 @@ HYDROGEN.AABB2D.prototype = {
             x = vlist[i].getX();
             y = vlist[i].getY();
 
-            if xmax == void 0 ? xmax = x : if x > xmax ? xmax = x;
-            if ymax == void 0 ? ymax = y : if y > ymax ? ymax = y;
+            xmax == void 0 ? xmax = x : x > xmax ? xmax = x : xmax = xmax;
+            ymax == void 0 ? ymax = y : y > ymax ? ymax = y : ymax = ymax;
 
-            if xmin == void 0 ? xmin = x : if x < xmin ? xmin = x;
-            if ymin == void 0 ? ymin = y : if y < ymin ? ymin = y;
+            xmin == void 0 ? xmin = x : x < xmin ? xmin = x : xmin = xmin;
+            ymin == void 0 ? ymin = y : y < ymin ? ymin = y : ymin = ymin;
         };
 
         this.hx = (xmax - xmin) / 2;
@@ -1464,7 +1474,7 @@ HYDROGEN.AABB2D.prototype = {
 
         this.v = new Vector2(
             xmin + this.hx,
-            ymin + this.hy,
+            ymin + this.hy
         );
 
     }
@@ -1483,8 +1493,8 @@ HYDROGEN.OABB2D.prototype = {
 
 //Define Bounding Plane in 2D
 HYDROGEN.BoundingPlane2D = function(p, n) {
-    if p !== void 0 ? this.p = p : this.p = new Vector2();
-    if n !== void 0 ? this.n = n : this.n = new Vector2(0, 1)
+    p !== void 0 ? this.p = p : this.p = new Vector2();
+    n !== void 0 ? this.n = n : this.n = new Vector2(0, 1)
 };
 HYDROGEN.BoundingPlane2D.prototype = {
     constructor: HYDROGEN.BoundingPlane2D,
@@ -1530,15 +1540,15 @@ HYDROGEN.CollisionDetector2D = function() {
     // body...
 };
 HYDROGEN.CollisionDetector2D.prototype = {
-    constructor: HYDROGEN.CollisionDetector2D
+    constructor: HYDROGEN.CollisionDetector2D,
 
-        checkForCollision: function(a, b) {
+    checkForCollision: function(a, b) {
         // body...
-        if a instanceof BoundingSphere2D && b instanceof BoundingSphere2D {
+        if ((a instanceof BoundingSphere2D) && (b instanceof BoundingSphere2D)) {
             return BoundingSphere2D_BoundingSphere2D(a, b);
-        } else if a instanceof AABB2D && b instanceof AABB2D {
+        } else if ((a instanceof AABB2D) && (b instanceof AABB2D)) {
             return AABB2D_AABB2(a, b);
-        } else if a instanceof OABB2D && b instanceof OABB2D {
+        } else if ((a instanceof OABB2D) && (b instanceof OABB2D)) {
             return OABB2D_OABB2D(a, b);
         } else {
             //finish
@@ -1568,27 +1578,27 @@ HYDROGEN.CollisionDetector3D.prototype = {
 
     constructor: HYDROGEN.CollisionDetector3D,
 
-    function checkForCollision(a, b) {
-        if a instanceof BoundingSphere3D && b instanceof BoundingSphere3D {
+    checkForCollision: function(a, b) {
+        if ((a instanceof BoundingSphere3D) && (b instanceof BoundingSphere3D)) {
             return BoundingSphere3D_BoundingSphere3D(a, b);
-        } else if a instanceof AABB3D && b instanceof AABB3D {
+        } else if ((a instanceof AABB3D) && (b instanceof AABB3D)) {
             return AABB3D_AABB3D(a, b);
-        } else if c {
+        } else if ((a instanceof OABB3D) && (b instanceof OABB3D))  {
             return OABB3D_OABB3D(a, b);
         } else {
             return false;
         }
     },
 
-    function BoundingSphere3D_BoundingSphere3D(a, b) {
+    BoundingSphere3D_BoundingSphere3D: function(a, b) {
         return (a.r + b.r) * (a.r + b.r) < a.v.subtractF(b.v).lengthSquared();
     },
 
-    function AABB3D_AABB3D(a, b) {
+    AABB3D_AABB3D: function(a, b) {
         return 2 * Math.abs(a.v.x - b.v.x) < a.hx + b.hx && 2 * Math.abs(a.v.y - b.v.y) < a.hy + b.hy && 2 * Math.abs(a.v.z - b.v.z) < a.hz + b.hz;
     },
 
-    function OABB3D_OABB3D(a, b) {
+    OABB3D_OABB3D: function(a, b) {
         return false;
     }
 };
@@ -1610,52 +1620,52 @@ HYDROGEN.Scene3D.prototype = {
 };
 
 //Define 2D Object
-HYDROGEN.Object2D = function() {
+// HYDROGEN.Object2D = function() {
 
-};
-HYRDOGEN.Object2D.prototype = {
+// };
+// HYRDOGEN.Object2D.prototype = {
 
-    constructor: Hydrogen.Object2D,
+//     constructor: HYDROGEN.Object2D,
 
-    //Physical properies
-    var position = new Vector2();
-    var velocity = new Vector2();
-    var orientation = 0.0;
-    var angular_velocity = 0.0;
-    var mass = 0.0;
-    var collision_geometry;
+//     //Physical properies
+//     // var position = new Vector2();
+//     // var velocity = new Vector2();
+//     // var orientation = 0.0;
+//     // var angular_velocity = 0.0;
+//     // var mass = 0.0;
+//     // var collision_geometry;
 
-    //Material properties
+//     //Material properties
 
-    //Mesh
+//     //Mesh
 
-    setPosition: function(x, y) {
-        this.position[0] = x;
-        this.position[1] = y
-    },
+//     setPosition: function(x, y) {
+//         this.position[0] = x;
+//         this.position[1] = y
+//     },
 
-    setVelocity: function(x, y) {
-        this.velocity[0] = x;
-        this.velocity[1] = y
-    },
+//     setVelocity: function(x, y) {
+//         this.velocity[0] = x;
+//         this.velocity[1] = y
+//     },
 
-    setOrientation: function(alpha) {
-        this.orientation = alpha
-    },
+//     setOrientation: function(alpha) {
+//         this.orientation = alpha
+//     },
 
-    setAngularVelocity: function(a) {
-        this.angular_velocity = a
-    },
+//     setAngularVelocity: function(a) {
+//         this.angular_velocity = a
+//     },
 
-    setMass: function(m) {
-        this.mass = m
-    },
+//     setMass: function(m) {
+//         this.mass = m
+//     },
 
-    iterate: function(dt) {
-        this.position.addScaledVector(this.velocity, dt);
-        this.orientation += angular_velocity * dt
-    }
-};
+//     iterate: function(dt) {
+//         this.position.addScaledVector(this.velocity, dt);
+//         this.orientation += angular_velocity * dt
+//     }
+// };
 
 //Define 3D Object
 HYDROGEN.Object3D = function() {
@@ -1666,12 +1676,12 @@ HYDROGEN.Object3D.prototype = {
     constructor: HYDROGEN.Object3D,
 
     //Physical properies
-    var position = new Vector3();
-    var velocity = new Vector3();
-    var orientation = new Quarternion();
-    var angular_velocity = new Vector3();
-    var mass = new Matrix33();
-    var collision_geometry
+    // var position = new Vector3();
+    // var velocity = new Vector3();
+    // var orientation = new Quarternion();
+    // var angular_velocity = new Vector3();
+    // var mass = new Matrix33();
+    // var collision_geometry
 
     //Material properties
 
@@ -1696,6 +1706,8 @@ HYDROGEN.Camera3D = function() {
 HYDROGEN.Camera3D.prototype = {
 
 };
+
+HYDROGEN.Shapes={};
 
 HYDROGEN.Shapes.Cylinder = function(l, r, b, drawElements) {
     var length = l || 0.5; //half length
@@ -1797,47 +1809,47 @@ HYDROGEN.Shapes.Box = function(x, y, z, drawElements) {
     switch (drawElements) {
         case "TRIANGLES":
             //TOP
-            verts[0] = new Vector3(,,);
-            verts[1] = new Vector3(,,);
-            verts[2] = new Vector3(,,);
-            verts[3] = new Vector3(,,);
-            verts[4] = new Vector3(,,);
-            verts[5] = new Vector3(,,);
-            //Side 1
-            verts[6] = new Vector3(,,);
-            verts[7] = new Vector3(,,);
-            verts[8] = new Vector3(,,);
-            verts[9] = new Vector3(,,);
-            verts[10] = new Vector3(,,);
-            verts[11] = new Vector3(,,);
-            //Side 2
-            verts[12] = new Vector3(,,);
-            verts[13] = new Vector3(,,);
-            verts[14] = new Vector3(,,);
-            verts[15] = new Vector3(,,);
-            verts[16] = new Vector3(,,);
-            verts[17] = new Vector3(,,);
-            //Side 3
-            verts[18] = new Vector3(,,);
-            verts[19] = new Vector3(,,);
-            verts[20] = new Vector3(,,);
-            verts[21] = new Vector3(,,);
-            verts[22] = new Vector3(,,);
-            verts[23] = new Vector3(,,);
-            //Side 4
-            verts[24] = new Vector3(,,);
-            verts[25] = new Vector3(,,);
-            verts[26] = new Vector3(,,);
-            verts[27] = new Vector3(,,);
-            verts[28] = new Vector3(,,);
-            verts[29] = new Vector3(,,);
-            //Bottom
-            verts[30] = new Vector3(,,);
-            verts[31] = new Vector3(,,);
-            verts[32] = new Vector3(,,);
-            verts[33] = new Vector3(,,);
-            verts[34] = new Vector3(,,);
-            verts[35] = new Vector3(,,);
+            // verts[0] = new Vector3(, , );
+            // verts[1] = new Vector3(, , );
+            // verts[2] = new Vector3(, , );
+            // verts[3] = new Vector3(, , );
+            // verts[4] = new Vector3(, , );
+            // verts[5] = new Vector3(, , );
+            // //Side 1
+            // verts[6] = new Vector3(, , );
+            // verts[7] = new Vector3(, , );
+            // verts[8] = new Vector3(, , );
+            // verts[9] = new Vector3(, , );
+            // verts[10] = new Vector3(, , );
+            // verts[11] = new Vector3(, , );
+            // //Side 2
+            // verts[12] = new Vector3(, , );
+            // verts[13] = new Vector3(, , );
+            // verts[14] = new Vector3(, , );
+            // verts[15] = new Vector3(, , );
+            // verts[16] = new Vector3(, , );
+            // verts[17] = new Vector3(, , );
+            // //Side 3
+            // verts[18] = new Vector3(, , );
+            // verts[19] = new Vector3(, , );
+            // verts[20] = new Vector3(, , );
+            // verts[21] = new Vector3(, , );
+            // verts[22] = new Vector3(, , );
+            // verts[23] = new Vector3(, , );
+            // //Side 4
+            // verts[24] = new Vector3(, , );
+            // verts[25] = new Vector3(, , );
+            // verts[26] = new Vector3(, , );
+            // verts[27] = new Vector3(, , );
+            // verts[28] = new Vector3(, , );
+            // verts[29] = new Vector3(, , );
+            // //Bottom
+            // verts[30] = new Vector3(, , );
+            // verts[31] = new Vector3(, , );
+            // verts[32] = new Vector3(, , );
+            // verts[33] = new Vector3(, , );
+            // verts[34] = new Vector3(, , );
+            // verts[35] = new Vector3(, , );
 
             break;
         case "POINTS":
