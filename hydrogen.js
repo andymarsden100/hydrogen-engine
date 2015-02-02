@@ -9,7 +9,7 @@ Comments:
 */
 
 //Create Hydrogen object
-var HYDROGEN = HYDROGEN || {}
+var HYDROGEN = HYDROGEN || {};
 
 HYDROGEN.prototype {
 
@@ -17,6 +17,7 @@ HYDROGEN.prototype {
 
     var gl;
     var canvas;
+    var canvas_name;
     var shaderProgram;
     //var shaderPrograms={}
     var shaderVertexPositionAttribute;
@@ -67,7 +68,9 @@ HYDROGEN.prototype {
             throw Error(msg);
         }
         this.gl = gl;
-        this.canvas = canvas
+        this.canvas = canvas;
+        this.canvas_name=canvas_name
+        canvas.appendChild(document.createTextNode("initWebGL"))
     },
 
     initViewPort: function() {
