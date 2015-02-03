@@ -11,23 +11,24 @@ Comments:
 //Create Hydrogen object
 //var HYDROGEN = HYDROGEN || {};
 
-HYDROGEN=function(){
-    //pass
+HYDROGEN = function() {
+    this.clearColour = new HYDROGEN.Colour();
+    this.clearColour.setFromPalette('red');
 };
 
 HYDROGEN.prototype = {
 
     constructor: HYDROGEN,
 
-    VERSION:1.0,
+    VERSION: 1.0,
     gl: null,
     canvas: null,
     canvas_name: null,
     shaderProgram: null,
-    //var shaderPrograms={}
     shaderVertexPositionAttribute: null,
     shaderProjectionMatrixUniform: null,
     shaderModelViewMatrixUniform: null,
+    clearColour: null,
 
     //Shader section
     vSh_simple: {
@@ -129,6 +130,12 @@ HYDROGEN.prototype = {
         if (!this.gl.getProgramParameter(this.shaderProgram, this.gl.LINK_STATUS)) {
             alert("Could not initialise shaders");
         }
+    },
+
+    draw: function() {
+        var cc = this.clearColour;
+        this.gl.clearColor(cc.getR(), cc.getG(), cc.getB(), 1.0);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
     }
 
 
@@ -1583,7 +1590,7 @@ HYDROGEN.CollisionDetector3D.prototype = {
             return BoundingSphere3D_BoundingSphere3D(a, b);
         } else if ((a instanceof AABB3D) && (b instanceof AABB3D)) {
             return AABB3D_AABB3D(a, b);
-        } else if ((a instanceof OABB3D) && (b instanceof OABB3D))  {
+        } else if ((a instanceof OABB3D) && (b instanceof OABB3D)) {
             return OABB3D_OABB3D(a, b);
         } else {
             return false;
@@ -1620,52 +1627,62 @@ HYDROGEN.Scene3D.prototype = {
 };
 
 //Define 2D Object
-// HYDROGEN.Object2D = function() {
+HYDROGEN.Object2D = function() {
+    //pass
+};
+HYDROGEN.Object2D.prototype = {
 
-// };
-// HYRDOGEN.Object2D.prototype = {
+    constructor: HYDROGEN.Object2D,
 
-//     constructor: HYDROGEN.Object2D,
+    //Physical properies
+    position: new HYDROGEN.Vector2(),
+    velocity: new HYDROGEN.Vector2(),
+    orientation: 0.0,
+    angular_velocity: 0.0,
+    mass: 0.0,
+    collision_geometry: null,
 
-//     //Physical properies
-//     // var position = new Vector2();
-//     // var velocity = new Vector2();
-//     // var orientation = 0.0;
-//     // var angular_velocity = 0.0;
-//     // var mass = 0.0;
-//     // var collision_geometry;
+    //Material properties
 
-//     //Material properties
+    //Mesh
+    buffer: null,
+    primtype: null,
 
-//     //Mesh
+    setBuffer: function(vert) {
+        //Needs to be passed gl instance to create buffer, need to make HYDROGEN public static equiv
+    },
 
-//     setPosition: function(x, y) {
-//         this.position[0] = x;
-//         this.position[1] = y
-//     },
+    setPrimtype: function(type) {
+        this.primtype = type;
+    },
 
-//     setVelocity: function(x, y) {
-//         this.velocity[0] = x;
-//         this.velocity[1] = y
-//     },
+    setPosition: function(x, y) {
+        this.position.x = x;
+        this.position.y = y
+    },
 
-//     setOrientation: function(alpha) {
-//         this.orientation = alpha
-//     },
+    setVelocity: function(x, y) {
+        this.velocity.x = x;
+        this.velocity.y = y
+    },
 
-//     setAngularVelocity: function(a) {
-//         this.angular_velocity = a
-//     },
+    setOrientation: function(alpha) {
+        this.orientation = alpha
+    },
 
-//     setMass: function(m) {
-//         this.mass = m
-//     },
+    setAngularVelocity: function(a) {
+        this.angular_velocity = a
+    },
 
-//     iterate: function(dt) {
-//         this.position.addScaledVector(this.velocity, dt);
-//         this.orientation += angular_velocity * dt
-//     }
-// };
+    setMass: function(m) {
+        this.mass = m
+    },
+
+    iterate: function(dt) {
+        this.position.addScaledVector(this.velocity, dt);
+        this.orientation += angular_velocity * dt
+    }
+};
 
 //Define 3D Object
 HYDROGEN.Object3D = function() {
@@ -1707,7 +1724,34 @@ HYDROGEN.Camera3D.prototype = {
 
 };
 
-HYDROGEN.Shapes={};
+HYDROGEN.Shapes = {};
+
+
+HYDROGEN.Shapes.Square = function(half_width, half_height, drawElements) {
+    var w = half_width || 0.5;
+    var h = half_height || 0.5;
+    var vert = [];
+
+    if (typeof drawElements === "undefined") {
+        drawElements = "TRIANGLES"
+    };
+
+    switch (drawElements) {
+        case "POINTS":
+            break;
+        default:
+            vert[0] = new Vector2(-w, h);
+            vert[1] = new Vector2(w, h);
+            vert[2] = new Vector2(w, -h);
+            vert[3] = new Vector2(-w, h);
+            vert[4] = new Vector2(w, -h);
+            vert[5] = new Vector2(-w, -h);
+    };
+
+    resut.draw_type = drawElements;
+    result.vertices = vert;
+
+};
 
 HYDROGEN.Shapes.Cylinder = function(l, r, b, drawElements) {
     var length = l || 0.5; //half length
@@ -1872,3 +1916,55 @@ HYDROGEN.Shapes.Box = function(x, y, z, drawElements) {
     return result;
 
 }
+
+HYDROGEN.Colour = function(r, g, b) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
+};
+
+HYDROGEN.Colour.prototype = {
+
+    constructor: HYDROGEN.Color,
+
+    setR: function(r) {
+        this.r = r
+    },
+
+    setG: function(g) {
+        this.g = g
+    },
+
+    setB: function(b) {
+        this.b = b
+    },
+
+    setFromPalette: function(name) {
+        var colour = HYDROGEN.Colour.Palette[name];
+        console.log("Color:" + name);
+        this.r = colour[0];
+        this.g = colour[1];
+        this.b = colour[2]
+    },
+
+    getR: function() {
+        return this.r / 255
+    },
+
+    getG: function() {
+        return this.g / 255;
+    },
+
+    getB: function() {
+        return this.b / 255;
+    }
+
+};
+
+HYDROGEN.Colour.Palette = {
+    white: [255, 255, 255],
+    black: [0, 0, 0],
+    red: [255, 0, 0],
+    green: [0, 255, 0],
+    blue: [0, 0, 255]
+};
